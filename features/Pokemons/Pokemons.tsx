@@ -1,21 +1,31 @@
 import React, { useEffect, useState } from "react";
-import { FlatList, Text, View, StyleSheet, TextInput, Dimensions } from "react-native";
+import { FlatList, Text, View, StyleSheet, TextInput, Dimensions, Button } from "react-native";
 import { pokeAPI } from "../../services/pokeAPI";
 import { PokemonShortInfo } from "../../types/Pokemon";
 import { Pokemon } from "./components/Pokemon";
 import { EvilIcons } from '@expo/vector-icons'; 
+import Toast from 'react-native-toast-message';
 
 export const Pokemons: React.FC = () => {
   const [pokemons, setPokemons] = useState<PokemonShortInfo[]>([]);
   const [pokeName, setPokeName] = useState('');
 
-  async function getPokemons(pokeName) {
+  async function getPokemons(pokeName: string) {
+    var success = false;
     try {
       const pokemons = await pokeAPI.getPokemons();
       if (pokeName){
         for (var search in pokemons){
           if (pokeName == pokemons[search].name){
             setPokemons(pokemons.slice(Number(search), Number(search)+1));
+            success = true;
+          }
+          if (Number(search) == (pokemons.length-1) && !success){        
+            Toast.show({
+              type: 'error',
+              text1: 'Ошибка',
+              text2: 'Не найдено совпадений'
+            });           
           }
         } 
       }
@@ -48,10 +58,11 @@ export const Pokemons: React.FC = () => {
         data={pokemons}
         // ! Привет костыль, неудобство во внешнем ресурсе
         renderItem={({ item }) => (         
-          <Pokemon index={item.url.split("/")[6]} data={item} />
+          <Pokemon index={Number(item.url.split("/")[6])} data={item} />
         )}
         style={styles.list}
       />
+      <Toast />
     </View>
   );
 };
