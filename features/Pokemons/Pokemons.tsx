@@ -25,7 +25,14 @@ export const Pokemons: React.FC = () => {
               type: 'error',
               text1: 'Ошибка',
               text2: 'Не найдено совпадений'
-            });           
+            });
+            function clearArray<T>(array: T[]) {
+              while (array.length) {
+                array.pop();
+              }
+            }
+            clearArray(pokemons);
+            setPokemons(pokemons);           
           }
         } 
       }
